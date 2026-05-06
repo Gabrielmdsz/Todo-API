@@ -5,6 +5,9 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import type { Todo } from "./types.js";
 import cors from "cors"
 
+if(!process.env.DATABASE_URL){
+    throw new Error('DATABASE_URL is not defined')
+}
 const adapter = new PrismaPg({connectionString: process.env.DATABASE_URL});
 const app = express();
 const prisma = new PrismaClient({ adapter });
@@ -24,7 +27,7 @@ app.post("/todos", async (req, res) => {
     const newTodo = await prisma.todo.create({
       data: {
         text,
-        completed: completed ?? false
+        completed: completed !== undefined ? completed : false
       },
     });
     res.status(201).json(newTodo);
